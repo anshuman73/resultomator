@@ -1,0 +1,5 @@
+# Ignore any locally generated sqlite files for testing
+*.sqlite
+
+# Ignore PyCharm files
+/.idea/
