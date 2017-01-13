@@ -86,7 +86,7 @@ def main(school_code, lower_limit, upper_limit):
             headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-Requests': 1, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'}
             params = {'regno': roll_no, 'schcode': school_code, 'B1': 'Submit'}
             page_source = requests.get('http://cbseresults.nic.in/class12/cbse1216.asp', params= params, headers=headers).text
-            html = ''.join(page_source.encode('utf8').split('\n')[67:])
+            html = ''.join(page_source.split('\n')[67:])
             data = parser(html)
             cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, Number_of_subjects) '
                             'VALUES (?, ?, ?, ?, ?, ?)', (data['Roll No:'], data['Name:'], data['Father\'s Name:'],
@@ -121,7 +121,7 @@ def main(school_code, lower_limit, upper_limit):
     print('\nFinished processing everything.\n')
     print('\nTook', time() - st, 'seconds for execution for processing', count, 'valid records')
 
-    input('Press any Key to exit: ')
+    input('Press Enter to exit: ')
 
 if __name__ == '__main__':
 
