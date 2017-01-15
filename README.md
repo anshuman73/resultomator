@@ -15,13 +15,13 @@ More than just a bet this time.
 Generated log at the end gave this -
 
 ```
-Log:
+Log: 
 
 416 valid records downloaded, saving everything to database...
 
 Finished processing everything.
 
 
-Took 22.844650506973267 seconds for execution for processing 416 valid records
-Press Enter to exit:
+Took 20.92346954345703 seconds for execution for processing 416 valid records
+
 ```
