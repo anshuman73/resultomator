@@ -10,7 +10,7 @@ More than just a bet this time.
 
 **Tests were done on a regular home network (40-50 mbps) and generic config.**
 
-*The script was run using Python 3*
+*The script was run using Python 3 on Ubuntu 16.04*
 
 Generated log at the end gave this -
 
