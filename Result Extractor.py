@@ -83,7 +83,7 @@ def main(school_code, lower_limit, upper_limit):
     count = 0
     for roll_no in range(lower_limit, upper_limit + 1):
         try:
-            headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-Requests': 1, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'}
+            headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'}
             params = {'regno': roll_no, 'schcode': school_code, 'B1': 'Submit'}
             page_source = requests.get('http://cbseresults.nic.in/class12/cbse1216.asp', params= params, headers=headers).text
             html = ''.join(page_source.split('\n')[67:])
@@ -96,7 +96,7 @@ def main(school_code, lower_limit, upper_limit):
                                 'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)', (data['Roll No:'], subject['SUB CODE'],
                                 subject['SUB NAME'], subject['THEORY'], subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
 
-            print('Processed Roll No.', roll_no)
+            print('Processed Roll No. {}'.format(roll_no))
             count += 1
 
             # The following lines should be un-commented if on a low RAM system, so that no data loss occurs...
@@ -105,23 +105,26 @@ def main(school_code, lower_limit, upper_limit):
                 database_conn.commit()'''
 
         except IndexError:
-            print('Result not found for this Roll Number - School Code combination: ', roll_no)
+            print('Result not found for this Roll Number - School Code combination: {}'.format(roll_no))
         except requests.exceptions.ConnectionError:
-            print('Faced Network Issues while retrieving results for Roll Number: ', roll_no)
+            print('Faced Network Issues while retrieving results for Roll Number: {}'.format(roll_no))
         except Exception as error:
-            print('Roll No.', roll_no, 'threw an unknown error, leaving it.')
+            print('Roll No. {} threw an unknown error, leaving it.'.format(roll_no))
             print(error)
 
     print('\n\nLog: \n')
 
-    print(count, 'valid records downloaded, saving everything to database...')
+    print('{} valid records downloaded, saving everything to database...'.format(count))
     database_conn.commit()
     database_conn.close()
 
     print('\nFinished processing everything.\n')
-    print('\nTook', time() - st, 'seconds for execution for processing', count, 'valid records')
+    print('\nTook {} seconds for execution for processing {} valid records'.format(time() - st, count))
 
-    input('Press Enter to exit: ')
+    try:
+        input('Press Enter to exit: ')
+    except SyntaxError:  # Stupid Python 2 compatibility
+        pass
 
 if __name__ == '__main__':
 
