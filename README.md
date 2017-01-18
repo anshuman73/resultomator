@@ -3,7 +3,7 @@
 A script to automate the process of generating data viz on basis of data from the CBSE results site.
 Currently supports only 12th Grade results.
 
-Based on the project https://github.com/anshuman73/2016-CBSE-Grade-12-Results , but faster, efficient, and more useful. Supports Python 3.
+Based on [this project](https://github.com/anshuman73/2016-CBSE-Grade-12-Results), but faster, efficient, and more useful. Supports Python 3.
 More than just a bet this time.
 
 ##Speed Benchmarking -
