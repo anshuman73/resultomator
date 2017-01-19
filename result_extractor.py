@@ -21,7 +21,6 @@ import sqlite3
 
 database_conn = sqlite3.connect('database.sqlite')
 cursor = database_conn.cursor()
-# TODO - Remove the DROP commands before going into production and replace by IF exists commands
 cursor.executescript('''
                     DROP TABLE IF EXISTS Records;
                     DROP TABLE IF EXISTS Marks;
@@ -78,23 +77,28 @@ def parser(html):
     return data
 
 
-def main(school_code, lower_limit, upper_limit):
+def extract(school_code, lower_limit, upper_limit):
     st = time()
     count = 0
     for roll_no in range(lower_limit, upper_limit + 1):
         try:
-            headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'}
+            headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-Requests': '1',
+                       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)'
+                                     'Chrome/53.0.2785.116 Safari/537.36'}
             params = {'regno': roll_no, 'schcode': school_code, 'B1': 'Submit'}
-            page_source = requests.get('http://cbseresults.nic.in/class12/cbse1216.asp', params= params, headers=headers).text
+            page_source = requests.get('http://cbseresults.nic.in/class12/cbse1216.asp', params=params,
+                                       headers=headers).text
             html = ''.join(page_source.split('\n')[67:])
             data = parser(html)
-            cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, Number_of_subjects) '
-                            'VALUES (?, ?, ?, ?, ?, ?)', (data['Roll No:'], data['Name:'], data['Father\'s Name:'],
-                            data['Mother\'s Name:'], data['final_result'], len(data['marks']), ))
+            cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, '
+                           'Number_of_subjects) VALUES (?, ?, ?, ?, ?, ?)',
+                           (data['Roll No:'], data['Name:'], data['Father\'s Name:'], data['Mother\'s Name:'],
+                            data['final_result'], len(data['marks']), ))
             for subject in data['marks']:
-                cursor.execute('INSERT INTO Marks (Roll_Number, Subject_Code, Subject_Name, Theory_Marks, '
-                                'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)', (data['Roll No:'], subject['SUB CODE'],
-                                subject['SUB NAME'], subject['THEORY'], subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
+                cursor.execute('INSERT INTO Marks (Roll_Number, Subject_Code, Subject_Name, Theory_Marks,'
+                               'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                               (data['Roll No:'], subject['SUB CODE'], subject['SUB NAME'], subject['THEORY'],
+                                subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
 
             print('Processed Roll No. {}'.format(roll_no))
             count += 1
@@ -132,4 +136,4 @@ if __name__ == '__main__':
     lwr = int(input('Enter the lower limit of the Roll Numbers: '))
     upr = int(input('Enter the upper limit of the Roll Numbers: '))
 
-    main(schcode, lwr, upr)
+    extract(schcode, lwr, upr)
