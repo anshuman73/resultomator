@@ -19,27 +19,27 @@ from time import time
 from bs4 import BeautifulSoup
 import sqlite3
 
-database_conn = sqlite3.connect('database.sqlite')
+database_conn = sqlite3.connect('raw_data.sqlite')
 cursor = database_conn.cursor()
 cursor.executescript('''
                     DROP TABLE IF EXISTS Records;
                     DROP TABLE IF EXISTS Marks;
                     CREATE TABLE IF NOT EXISTS Records (
-                        Roll_Number  INTEGER PRIMARY KEY,
-                        Name         TEXT,
-                        Father_Name  TEXT,
-                        Mother_Name  TEXT,
-                        Final_Result TEXT,
+                        Roll_Number        INTEGER PRIMARY KEY,
+                        Name               TEXT,
+                        Father_Name        TEXT,
+                        Mother_Name        TEXT,
+                        Final_Result       TEXT,
                         Number_of_subjects INTEGER
                         );
                     CREATE TABLE IF NOT EXISTS Marks (
                         Roll_Number INTEGER,
-                        Subject_Code TEXT,
-                        Subject_Name TEXT,
-                        Theory_Marks INTEGER,
+                        Subject_Code    TEXT,
+                        Subject_Name    TEXT,
+                        Theory_Marks    INTEGER,
                         Practical_Marks INTEGER,
-                        Total_Marks INTEGER,
-                        Grade TEXT
+                        Total_Marks     INTEGER,
+                        Grade           TEXT
                         )
                     ''')
 
@@ -130,10 +130,16 @@ def extract(school_code, lower_limit, upper_limit):
     except SyntaxError:  # Stupid Python 2 compatibility
         pass
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # Allows to use it as standalone, for demonstration purposes
 
     schcode = int(input('Enter the School Code: '))
     lwr = int(input('Enter the lower limit of the Roll Numbers: '))
     upr = int(input('Enter the upper limit of the Roll Numbers: '))
 
     extract(schcode, lwr, upr)
+
+
+# TODO: Find a method to retry failed roll no.s
+# TODO: Try to incorporate Kenith Reitz's color lib for error messages and successful messages.
+# they might help to spot the errors easily in verbose mode
+# TODO: ^ That reminds me to add a proper verbose mode arg in Command line mode or make a GUI app on top of these scripts
