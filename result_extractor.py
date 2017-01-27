@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 import requests
-from time import time
 from bs4 import BeautifulSoup
 import sqlite3
 
@@ -78,7 +77,6 @@ def parser(html):
 
 
 def extract(school_code, lower_limit, upper_limit):
-    st = time()
     count = 0
     for roll_no in range(lower_limit, upper_limit + 1):
         try:
@@ -100,7 +98,7 @@ def extract(school_code, lower_limit, upper_limit):
                                (data['Roll No:'], subject['SUB CODE'], subject['SUB NAME'], subject['THEORY'],
                                 subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
 
-            print('Processed Roll No. {}'.format(roll_no))
+            print('Retrieved data for Roll No. {}'.format(roll_no))
             count += 1
 
             # The following lines should be un-commented if on a low RAM system, so that no data loss occurs...
@@ -116,19 +114,11 @@ def extract(school_code, lower_limit, upper_limit):
             print('Roll No. {} threw an unknown error, leaving it.'.format(roll_no))
             print(error)
 
-    print('\n\nLog: \n')
-
-    print('{} valid records downloaded, saving everything to database...'.format(count))
+    print('\n{} valid records downloaded in the range {} to {} (both inclusive), saving everything to database...'
+          .format(count, lower_limit, upper_limit))
     database_conn.commit()
     database_conn.close()
 
-    print('\nFinished processing everything.\n')
-    print('\nTook {} seconds for execution for processing {} valid records'.format(time() - st, count))
-
-    try:
-        input('Press Enter to exit: ')
-    except SyntaxError:  # Stupid Python 2 compatibility
-        pass
 
 if __name__ == '__main__':  # Allows to use it as standalone, for demonstration purposes
 
@@ -142,4 +132,4 @@ if __name__ == '__main__':  # Allows to use it as standalone, for demonstration 
 # TODO: Find a method to retry failed roll no.s
 # TODO: Try to incorporate Kenith Reitz's color lib for error messages and successful messages.
 # they might help to spot the errors easily in verbose mode
-# TODO: ^ That reminds me to add a proper verbose mode arg in Command line mode or make a GUI app on top of these scripts
+# TODO: ^ That reminds me to add a proper verbose mode arg in Command line mode or make a GUI app on top of this

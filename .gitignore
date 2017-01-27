@@ -2,4 +2,7 @@
 *.sqlite
 
 # Ignore PyCharm files
-/.idea/
+.idea/
+
+# Ignore pycache files (byte-code compiled files)
+__pycache__/
