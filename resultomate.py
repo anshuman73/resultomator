@@ -1,7 +1,7 @@
 from time import time
 import os
-import result_extractor
-import data_cleaner
+import extractor
+import cleaner
 
 
 def main():
@@ -12,11 +12,11 @@ def main():
 
     print('\n\nLog: \n')
 
-    result_extractor.extract(schcode, lwr, upr)
+    extractor.extract(schcode, lwr, upr)
     print('\nSaved Raw data in a Database. ')
 
     print('\nProcessing and Normalizing data...')
-    data_cleaner.clean()
+    cleaner.clean()
     print('\n\nData successfully Normalized\n')
     print('Deleting raw database')
     os.remove(os.getcwd() + '/raw_data.sqlite')
