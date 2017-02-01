@@ -133,3 +133,6 @@ if __name__ == '__main__':  # Allows to use it as standalone, for demonstration 
 # TODO: Try to incorporate Kenith Reitz's color lib for error messages and successful messages.
 # they might help to spot the errors easily in verbose mode
 # TODO: ^ That reminds me to add a proper verbose mode arg in Command line mode or make a GUI app on top of this
+# I am becoming more and more inclined towards GUI, or rather a web app.
+# GUI support will take a lot of time, and will then require freezing on different OS(es). Meh.
+

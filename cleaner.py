@@ -18,6 +18,10 @@ import sqlite3
 import json
 
 
+def name_cap(name):
+    return ' '.join([word.strip().capitalize() for word in str(name).split(' ')])
+
+
 def clean():
     raw_db_conn = sqlite3.connect('raw_data.sqlite')
     raw_db_cursor = raw_db_conn.cursor()
@@ -51,7 +55,7 @@ def clean():
     subject_code_combos = raw_db_cursor.fetchall()
     for code, name in subject_code_combos:
         clean_db_cursor.execute('INSERT INTO Subjects (Subject_Code, Subject_Name) VALUES (?, ?)',
-                                (str(code), ' '.join([word.strip().capitalize() for word in str(name).split(' ')]), ))
+                                (str(code), name_cap(name), ))
 
     # Now we take all the subject codes from the newly formed table and create tables for each subject code
     print('\n\nCreating individual subject tables\n')
@@ -94,8 +98,8 @@ def clean():
         # Insert clean student data
         clean_db_cursor.execute('INSERT INTO Students (Roll_Number, Name, Father_Name, Mother_Name, Number_of_Subjects,'
                                 'Subjects, Final_Result) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                                (str(student_details[0]), str(student_details[1]), str(student_details[2]),
-                                 str(student_details[3]), str(student_details[5]), all_sub_codes,
+                                (str(student_details[0]), name_cap(student_details[1]), name_cap(student_details[2]),
+                                 name_cap(student_details[3]), str(student_details[5]), all_sub_codes,
                                  str(student_details[4]), ))
         # Insert cleaned subject data of each student in respective subject tables
         for sub_code, marks in student_subjects.items():

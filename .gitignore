@@ -1,6 +1,10 @@
 # Ignore any locally generated sqlite files for testing
 *.sqlite
 
+# Ignore Excel files created while testing
+*.xlsx
+*.xls
+
 # Ignore PyCharm files
 .idea/
 

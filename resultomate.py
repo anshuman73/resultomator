@@ -18,6 +18,7 @@ from time import time
 import os
 import extractor
 import cleaner
+import visualizer
 
 
 def main():
@@ -39,8 +40,8 @@ def main():
     print('Raw database deleted !\n')
 
     print('\nReady to visualize data...\n')
-
-    # Write viz code / call the functions from module
+    print('\nDumping data to excel files...\n')
+    visualizer.excelify()
 
     print('\nFinished processing everything.\n')
     print('\nTook {} seconds for execution'.format(time() - st))
