@@ -48,7 +48,7 @@ def clean():
     for code, name in raw_db_cursor.execute('SELECT DISTINCT Subject_Code, Subject_Name '
                                             'FROM Marks ORDER BY Subject_Code'):
         clean_db_cursor.execute('INSERT INTO Subjects (Subject_Code, Subject_Name) VALUES (?, ?)',
-                                (str(code), str(name), ))
+                                (str(code), ' '.join([word.strip().capitalize() for word in str(name).split(' ')]), ))
 
     # Now we take all the subject codes from the newly formed table and create tables for each subject code
     print('\n\nCreating individual subject tables\n')

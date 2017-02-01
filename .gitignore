@@ -4,5 +4,6 @@
 # Ignore PyCharm files
 .idea/
 
-# Ignore pycache files (byte-code compiled files)
+# Ignore pycache files and byte-code compiled files
 __pycache__/
+*.pyc
