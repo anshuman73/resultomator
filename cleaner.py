@@ -23,10 +23,12 @@ def clean():
     raw_db_cursor = raw_db_conn.cursor()
     clean_db_conn = sqlite3.connect('clean_data.sqlite')
     clean_db_cursor = clean_db_conn.cursor()
-
+    # Delete existing tables if a db exists already
+    clean_db_cursor.execute('SELECT name FROM sqlite_master WHERE type="table"')
+    existing_tables = clean_db_cursor.fetchall()
+    for table in existing_tables:
+        clean_db_cursor.execute('DROP TABLE {}'.format(str(table[0])))
     clean_db_cursor.executescript('''
-                                  DROP TABLE IF EXISTS Subjects;
-                                  DROP TABLE IF EXISTS Students;
                                   CREATE TABLE IF NOT EXISTS Subjects (
                                       Subject_Code TEXT PRIMARY KEY,
                                       Subject_Name TEXT
@@ -45,8 +47,9 @@ def clean():
     # Fill data in Subjects table.
     # Gets unique subject code values and puts them in table with the name
     print("\nCreating table 'Subjects'")
-    for code, name in raw_db_cursor.execute('SELECT DISTINCT Subject_Code, Subject_Name '
-                                            'FROM Marks ORDER BY Subject_Code'):
+    raw_db_cursor.execute('SELECT DISTINCT Subject_Code, Subject_Name FROM Marks ORDER BY Subject_Code')
+    subject_code_combos = raw_db_cursor.fetchall()
+    for code, name in subject_code_combos:
         clean_db_cursor.execute('INSERT INTO Subjects (Subject_Code, Subject_Name) VALUES (?, ?)',
                                 (str(code), ' '.join([word.strip().capitalize() for word in str(name).split(' ')]), ))
 
@@ -58,7 +61,6 @@ def clean():
         print('Creating Table _{}'.format(str(code[0])))
         # Probably a worry for injection, remove if going web app ish
         # Underscore before sub_code as initial char numeric is not supported by sqlite
-        clean_db_cursor.execute('DROP TABLE IF EXISTS _{}'.format(str(code[0])))
         clean_db_cursor.execute('''
                                 CREATE TABLE IF NOT EXISTS _{} (
                                     Roll_Number     INTEGER PRIMARY KEY,
@@ -83,7 +85,10 @@ def clean():
         student_subject_details = raw_db_cursor.fetchall()
         student_subjects = dict()
         # Convert tuple to dict with list values for easier data access.
-        for sub, *marks in student_subject_details:
+        # Kill me, Python 2 doesn't have anything like PEP 3132. Unpacking is such a nightmare in Py2.
+        # If I ever drop Py2 support (doesn't seem far away), this shit gets replaced first by sub, *marks unpacking
+        for detail in student_subject_details:
+            sub, marks = detail[0], detail[1:]
             student_subjects[sub] = marks
         all_sub_codes = json.dumps([sub_code for sub_code, marks in student_subjects.items()])
         # Insert clean student data
