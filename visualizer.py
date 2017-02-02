@@ -47,7 +47,8 @@ def excelify():
         sub_worksheet.write(0, 4, 'Total Marks')
         sub_worksheet.write(0, 5, 'Grade')
         db_cursor.execute('SELECT sub.Roll_Number, stud.Name, sub.Theory_Marks, sub.Practical_Marks, sub.Total_Marks,'
-                          'sub.Grade FROM _{} sub JOIN Students stud ON sub.Roll_Number = stud.Roll_Number'.format(code))
+                          'sub.Grade FROM _{} sub JOIN Students stud ON sub.Roll_Number = stud.Roll_Number '
+                          'ORDER BY sub.Total_Marks DESC'.format(code))
         students_details = db_cursor.fetchall()
         number_of_students = len(students_details)
         for row_num in range(2, number_of_students + 2):
