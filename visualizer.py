@@ -48,13 +48,12 @@ def excelify():
         sub_worksheet.write(0, 5, 'Grade')
         db_cursor.execute('SELECT sub.Roll_Number, stud.Name, sub.Theory_Marks, sub.Practical_Marks, sub.Total_Marks,'
                           'sub.Grade FROM _{} sub JOIN Students stud ON sub.Roll_Number = stud.Roll_Number '
-                          'ORDER BY sub.Total_Marks DESC'.format(code))
+                          'ORDER BY sub.Total_Marks DESC, stud.Name ASC'.format(code))
         students_details = db_cursor.fetchall()
         number_of_students = len(students_details)
         for row_num in range(2, number_of_students + 2):
             sub_worksheet.set_row(row_num, 18, left_align_format)
-            for column_num in range(0, 6):
-                sub_worksheet.write(row_num, column_num, students_details[row_num - 2][column_num])
+            sub_worksheet.write_row(row_num, 0, students_details[row_num - 2])
 
     main_workbook.close()
 
