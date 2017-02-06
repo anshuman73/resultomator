@@ -85,7 +85,7 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
     elif net_choice == 'n':
         net_choice = False
     else:
-        print('Incorrect Network mode chosen, defaulting to non-async')
+        print('\nIncorrect Network mode chosen, defaulting to non-async\n')
         net_choice = False
     count = 0
     headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-grequests': '1',
