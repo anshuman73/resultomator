@@ -17,6 +17,7 @@ limitations under the License.
 from time import time
 import os
 import extractor
+import trial
 import cleaner
 import visualizer
 
@@ -29,7 +30,8 @@ def main():
 
     print('\n\nLog: \n')
 
-    extractor.extract(schcode, lwr, upr)
+    trial.extract(schcode, lwr, upr)
+    print(time() - st)
     print('\nSaved Raw data in a Database. ')
 
     print('\nProcessing and Normalizing data...')
