@@ -149,4 +149,3 @@ if __name__ == '__main__':  # Allows to use it as standalone, for demonstration 
     net_ch = input('Go async mode for network requests ? (Y/N): ').strip().lower()
 
     extract(schcode, lwr, upr, net_ch)
-
