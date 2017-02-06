@@ -58,7 +58,7 @@ def clean():
                                 (str(code), name_cap(name), ))
 
     # Now we take all the subject codes from the newly formed table and create tables for each subject code
-    print('\n\nCreating individual subject tables\n')
+    print('\n\nNormalizing Subjects data\n')
     clean_db_cursor.execute('SELECT Subject_Code FROM Subjects;')
     all_subs = clean_db_cursor.fetchall()
     for code in all_subs:
