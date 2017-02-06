@@ -50,7 +50,7 @@ def clean():
 
     # Fill data in Subjects table.
     # Gets unique subject code values and puts them in table with the name
-    print("\nCreating table 'Subjects'")
+    print('Normalizing Subject data\n')
     raw_db_cursor.execute('SELECT DISTINCT Subject_Code, Subject_Name FROM Marks ORDER BY Subject_Code')
     subject_code_combos = raw_db_cursor.fetchall()
     for code, name in subject_code_combos:
@@ -58,11 +58,9 @@ def clean():
                                 (str(code), name_cap(name), ))
 
     # Now we take all the subject codes from the newly formed table and create tables for each subject code
-    print('\n\nNormalizing Subjects data\n')
     clean_db_cursor.execute('SELECT Subject_Code FROM Subjects;')
     all_subs = clean_db_cursor.fetchall()
     for code in all_subs:
-        print('Creating Table _{}'.format(str(code[0])))
         # Probably a worry for injection, remove if going web app ish
         # Underscore before sub_code as initial char numeric is not supported by sqlite
         clean_db_cursor.execute('''
@@ -78,12 +76,11 @@ def clean():
     # Fill data in the Students Table
     # Gets all subjects from `Marks` table and sorts into the individual subjects tables.
     # Also generates json text dump for all subjects taken by the student
-    print('\n\nNormalizing student records\n')
+    print('Normalizing student records\n')
     raw_db_cursor.execute('SELECT Roll_Number, Name, Father_Name, Mother_Name, Final_Result, Number_of_subjects '
                           'FROM Records ORDER BY Roll_Number;')
     all_students = raw_db_cursor.fetchall()
     for student_details in all_students:
-        print('Normalizing data for record with Roll Number {}'.format(str(student_details[0])))
         raw_db_cursor.execute('SELECT Subject_Code, Theory_Marks, Practical_Marks, Total_Marks, Grade FROM Marks '
                               'WHERE Roll_Number=? ORDER BY Subject_Code;', (str(student_details[0]), ))
         student_subject_details = raw_db_cursor.fetchall()

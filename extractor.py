@@ -93,9 +93,8 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
                              'Chrome/53.0.2785.116 Safari/537.36'}
     urls = ['http://cbseresults.nic.in/class12/cbse1216.asp?regno={}&schcode={}&B1=Submit'
             .format(roll_no, school_code) for roll_no in range(lower_limit, upper_limit + 1)]
+    print('Retrieving data for {} students, may take a few seconds depending on the network\n'.format(len(urls)))
     if net_choice:
-        print('Retrieving data for {} students asynchronously, may take a few seconds depending on the network\n'
-              .format(len(urls)))
         responses = (grequests.get(u, headers=headers) for u in urls)
         page_sources = grequests.map(responses)
     else:
@@ -104,14 +103,13 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
             roll_no = url[url.find('=') + 1:url.find('&')]
             try:
                 page_sources.append(requests.get(url, headers=headers))
-                print('Successfully retrieved data for Roll No. {}'.format(roll_no))
             except requests.exceptions.ConnectionError:
                 page_sources.append(None)
             except Exception as error:
                 print('Some unknown, unexpected error has been thrown, call the developer. AAAAHHHHHH')
                 print('Report this error to him: {}'.format(error))
 
-    print('\nRetrieved data for {} records out of {} records asked for.\n'
+    print('Retrieved data for {} records out of {} records asked for.\n'
           .format(len(page_sources), len(urls)))
     for page_source in page_sources:
         try:
@@ -139,7 +137,7 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
 
     database_conn.commit()
     database_conn.close()
-    print('\n{} valid records downloaded and saved in the range {} to {} (both inclusive),'
+    print('{} valid records downloaded and saved in the range {} to {} (both inclusive),'
           .format(count, lower_limit, upper_limit))
 
 

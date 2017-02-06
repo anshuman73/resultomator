@@ -32,21 +32,20 @@ def main():
 
     extractor.extract(schcode, lwr, upr, net_choice)
     print('\nData retrieval from network took {} seconds'.format(time() - st))
-    print('\nSaved Raw data in a Database. ')
+    print('\n\nSaved Raw data in a Database.\n')
 
-    print('\nProcessing and Normalizing data...')
+    print('\nProcessing and Normalizing data...\n')
     cleaner.clean()
-    print('\n\nData successfully Normalized\n')
-    print('Deleting raw database')
+    print('\nData successfully Normalized\n')
+    print('\nDeleting raw database')
     os.remove(os.getcwd() + '/raw_data.sqlite')
     print('Raw database deleted !\n')
 
-    print('\nReady to visualize data...\n')
     print('\nDumping data to excel files...\n')
     visualizer.excelify()
 
     print('\nFinished processing everything.')
-    print('Took {} seconds for execution'.format(time() - st))
+    print('Took {} seconds for execution\n'.format(time() - st))
 
     input('Press Enter to exit: ')
 
