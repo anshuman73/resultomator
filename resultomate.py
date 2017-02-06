@@ -17,7 +17,6 @@ limitations under the License.
 from time import time
 import os
 import extractor
-import trial
 import cleaner
 import visualizer
 
@@ -26,12 +25,13 @@ def main():
     schcode = int(input('Enter the School Code: '))
     lwr = int(input('Enter the lower limit of the Roll Numbers: '))
     upr = int(input('Enter the upper limit of the Roll Numbers: '))
+    net_choice = str(input('Go async mode for network requests ? (Y/N): ')).strip().lower()
     st = time()
 
     print('\n\nLog: \n')
 
-    trial.extract(schcode, lwr, upr)
-    print(time() - st)
+    extractor.extract(schcode, lwr, upr, net_choice)
+    print('Data retrieval from network took {} seconds'.format(time() - st))
     print('\nSaved Raw data in a Database. ')
 
     print('\nProcessing and Normalizing data...')
@@ -45,13 +45,10 @@ def main():
     print('\nDumping data to excel files...\n')
     visualizer.excelify()
 
-    print('\nFinished processing everything.\n')
-    print('\nTook {} seconds for execution'.format(time() - st))
+    print('\nFinished processing everything.')
+    print('Took {} seconds for execution'.format(time() - st))
 
-    try:
-        input('Press Enter to exit: ')
-    except SyntaxError:  # Stupid Python 2 compatibility
-            pass
+    input('Press Enter to exit: ')
 
 if __name__ == '__main__':
     main()

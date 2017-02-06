@@ -14,9 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import grequests
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
+
 
 database_conn = sqlite3.connect('raw_data.sqlite')
 cursor = database_conn.cursor()
@@ -44,6 +46,7 @@ cursor.executescript('''
 
 
 def parser(html):
+    html = ''.join(html.split('\n')[67:])
     data = dict()
     marks_table_index = list()
     marks = list()
@@ -76,48 +79,68 @@ def parser(html):
     return data
 
 
-def extract(school_code, lower_limit, upper_limit):
+def extract(school_code, lower_limit, upper_limit, net_choice):
+    if net_choice == 'y':
+        net_choice = True
+    elif net_choice == 'n':
+        net_choice = False
+    else:
+        print('Incorrect Network mode chosen, defaulting to non-async')
+        net_choice = False
     count = 0
-    for roll_no in range(lower_limit, upper_limit + 1):
+    headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-grequests': '1',
+               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)'
+                             'Chrome/53.0.2785.116 Safari/537.36'}
+    urls = ['http://cbseresults.nic.in/class12/cbse1216.asp?regno={}&schcode={}&B1=Submit'
+            .format(roll_no, school_code) for roll_no in range(lower_limit, upper_limit + 1)]
+    if net_choice:
+        print('Retrieving data for {} students asynchronously, may take a few seconds depending on the network\n'
+              .format(len(urls)))
+        responses = (grequests.get(u, headers=headers) for u in urls)
+        page_sources = grequests.map(responses)
+    else:
+        page_sources = list()
+        for url in urls:
+            roll_no = url[url.find('=') + 1:url.find('&')]
+            try:
+                page_sources.append(requests.get(url, headers=headers))
+                print('Successfully retrieved data for Roll No. {}'.format(roll_no))
+            except requests.exceptions.ConnectionError:
+                page_sources.append(None)
+            except Exception as error:
+                print('Some unknown, unexpected error has been thrown, call the developer. AAAAHHHHHH')
+                print('Report this error to him: {}'.format(error))
+
+    print('\nRetrieved data for {} records out of {} records asked for.\n'
+          .format(len(page_sources), len(urls)))
+    for page_source in page_sources:
         try:
-            headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-Requests': '1',
-                       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)'
-                                     'Chrome/53.0.2785.116 Safari/537.36'}
-            params = {'regno': roll_no, 'schcode': school_code, 'B1': 'Submit'}
-            page_source = requests.get('http://cbseresults.nic.in/class12/cbse1216.asp', params=params,
-                                       headers=headers).text
-            html = ''.join(page_source.split('\n')[67:])
-            data = parser(html)
-            cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, '
-                           'Number_of_subjects) VALUES (?, ?, ?, ?, ?, ?)',
-                           (data['Roll No:'], data['Name:'], data['Father\'s Name:'], data['Mother\'s Name:'],
-                            data['final_result'], len(data['marks']), ))
-            for subject in data['marks']:
-                cursor.execute('INSERT INTO Marks (Roll_Number, Subject_Code, Subject_Name, Theory_Marks,'
-                               'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                               (data['Roll No:'], subject['SUB CODE'], subject['SUB NAME'], subject['THEORY'],
-                                subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
-
-            print('Retrieved data for Roll No. {}'.format(roll_no))
-            count += 1
-
-            # The following lines should be un-commented if on a low RAM system, so that no data loss occurs...
-            '''if count % 50 == 0:
-                print '\n50 records in RAM, saving to database to avoid loss of data...\n'
-                database_conn.commit()'''
+            if page_source and page_source.status_code == 200:
+                roll_no = page_source.url[page_source.url.find('=') + 1:page_source.url.find('&')]
+                data = parser(page_source.text)
+                cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, '
+                               'Number_of_subjects) VALUES (?, ?, ?, ?, ?, ?)',
+                               (data['Roll No:'], data['Name:'], data['Father\'s Name:'], data['Mother\'s Name:'],
+                                data['final_result'], len(data['marks']), ))
+                for subject in data['marks']:
+                    cursor.execute('INSERT INTO Marks (Roll_Number, Subject_Code, Subject_Name, Theory_Marks,'
+                                   'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                                   (data['Roll No:'], subject['SUB CODE'], subject['SUB NAME'], subject['THEORY'],
+                                    subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
+                count += 1
+            else:
+                print('Failed to retrieve data for Roll No. {}'.format(roll_no))
 
         except IndexError:
-            print('Result not found for this Roll Number - School Code combination: {}'.format(roll_no))
-        except requests.exceptions.ConnectionError:
-            print('Faced Network Issues while retrieving results for Roll Number: {}'.format(roll_no))
+            print('Result not found for this Roll Number-School Code combination: {}-{}'.format(roll_no, school_code))
         except Exception as error:
-            print('Roll No. {} threw an unknown error, leaving it.'.format(roll_no))
-            print(error)
+            print('Some unknown, unexpected error has been thrown, call the developer. AAAAHHHHHH')
+            print('Report this error to him: {}'.format(error))
 
-    print('\n{} valid records downloaded in the range {} to {} (both inclusive), saving everything to database...'
-          .format(count, lower_limit, upper_limit))
     database_conn.commit()
     database_conn.close()
+    print('\n{} valid records downloaded and saved in the range {} to {} (both inclusive),'
+          .format(count, lower_limit, upper_limit))
 
 
 if __name__ == '__main__':  # Allows to use it as standalone, for demonstration purposes
@@ -125,14 +148,7 @@ if __name__ == '__main__':  # Allows to use it as standalone, for demonstration 
     schcode = int(input('Enter the School Code: '))
     lwr = int(input('Enter the lower limit of the Roll Numbers: '))
     upr = int(input('Enter the upper limit of the Roll Numbers: '))
+    net_ch = input('Go async mode for network requests ? (Y/N): ').strip().lower()
 
-    extract(schcode, lwr, upr)
-
-
-# TODO: Find a method to retry failed roll no.s
-# TODO: Try to incorporate Kenith Reitz's color lib for error messages and successful messages.
-# they might help to spot the errors easily in verbose mode
-# TODO: ^ That reminds me to add a proper verbose mode arg in Command line mode or make a GUI app on top of this
-# I am becoming more and more inclined towards GUI, or rather a web app.
-# GUI support will take a lot of time, and will then require freezing on different OS(es). Meh.
+    extract(schcode, lwr, upr, net_ch)
 

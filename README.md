@@ -3,8 +3,12 @@
 A script to automate the process of generating data viz on basis of data from the CBSE results site.
 Currently supports only 12th Grade results.
 
-Based on [this project](https://github.com/anshuman73/2016-CBSE-Grade-12-Results), but faster, efficient, and more useful. Supports Python 3.
+Based on [this project](https://github.com/anshuman73/2016-CBSE-Grade-12-Results), but faster, efficient, and more useful.
 More than just a bet this time.
+
+
+**Incompatible with Python 2, Uses Python 3.**
+
 
 ##Speed Benchmarking -
 
@@ -12,16 +16,10 @@ More than just a bet this time.
 
 *The script was run using Python 3 on Ubuntu 16.04*
 
-Generated log at the end gave this -
+Generated log at the end gave this (when using async data retrieval) -
 
 ```
-Log: 
-
-416 valid records downloaded, saving everything to database...
-
 Finished processing everything.
-
-
-Took 20.92346954345703 seconds for execution for processing 416 valid records
+Took 17.075409650802612 seconds for execution
 
 ```

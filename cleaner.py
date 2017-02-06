@@ -83,16 +83,13 @@ def clean():
                           'FROM Records ORDER BY Roll_Number;')
     all_students = raw_db_cursor.fetchall()
     for student_details in all_students:
-        print('Normalizing Roll Number {}'.format(str(student_details[0])))
+        print('Normalizing data for record with Roll Number {}'.format(str(student_details[0])))
         raw_db_cursor.execute('SELECT Subject_Code, Theory_Marks, Practical_Marks, Total_Marks, Grade FROM Marks '
                               'WHERE Roll_Number=? ORDER BY Subject_Code;', (str(student_details[0]), ))
         student_subject_details = raw_db_cursor.fetchall()
         student_subjects = dict()
         # Convert tuple to dict with list values for easier data access.
-        # Kill me, Python 2 doesn't have anything like PEP 3132. Unpacking is such a nightmare in Py2.
-        # If I ever drop Py2 support (doesn't seem far away), this shit gets replaced first by sub, *marks unpacking
-        for detail in student_subject_details:
-            sub, marks = detail[0], detail[1:]
+        for sub, *marks in student_subject_details:
             student_subjects[sub] = marks
         all_sub_codes = json.dumps([sub_code for sub_code, marks in student_subjects.items()])
         # Insert clean student data
