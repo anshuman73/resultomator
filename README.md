@@ -23,3 +23,8 @@ Finished processing everything.
 Took 13.299899101257324 seconds for execution
 
 ```
+
+##License
+
+This code ("code" referring to all files in this repository) is licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+Detailed [Legal Code](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) is also attached as LICENSE.md
