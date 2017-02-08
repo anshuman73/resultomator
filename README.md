@@ -20,6 +20,6 @@ Generated log at the end gave this (when using async data retrieval) -
 
 ```
 Finished processing everything.
-Took 17.075409650802612 seconds for execution
+Took 13.299899101257324 seconds for execution
 
 ```
