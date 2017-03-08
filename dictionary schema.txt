@@ -1,0 +1,11 @@
+subjects = {
+    subject_code {
+        subject_name = ''
+        students = {
+            roll_no = {
+                marks = int
+                grade = char
+            }
+        }
+    }
+}
