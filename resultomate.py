@@ -20,7 +20,7 @@ def main():
     print('\n\nLog: \n')
 
     extractor.extract(schcode, lwr, upr, net_choice)
-    print('\nData retrieval from network took {} seconds'.format(time() - st))
+    print('\nData retrieval from network and saving raw data into database took {} seconds'.format(time() - st))
     print('\n\nSaved Raw data in a Database.\n')
 
     print('\nProcessing and Normalizing data...\n')

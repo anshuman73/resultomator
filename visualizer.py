@@ -107,6 +107,3 @@ def excelify():
 
 if __name__ == '__main__':
     excelify()
-
-# TODO: If a column is empty or has '---' , then skip the creation of the column. This can be done in the cleaner module
-# and then the excel columns can be generated on basis of a db query of columns in each subject table
