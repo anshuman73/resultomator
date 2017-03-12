@@ -7,7 +7,7 @@ from time import time
 import os
 import extractor
 import cleaner
-import visualizer
+import excelify
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
     print('Raw database deleted !\n')
 
     print('\nDumping data to excel files...\n')
-    visualizer.excelify()
+    excelify.excelify()
 
     print('\nFinished processing everything.')
     print('Took {} seconds for execution\n'.format(time() - st))
