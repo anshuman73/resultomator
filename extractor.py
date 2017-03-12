@@ -95,15 +95,16 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
             except requests.exceptions.ConnectionError:
                 page_sources.append(None)
             except Exception as error:
-                print('Some unknown, unexpected error has been thrown, call the developer. AAAAHHHHHH')
+                page_sources.append(None)
+                print('AAAAHHHHHH. Roll No. {} threw an unknown, unexpected error, call the developer.'.format(roll_no))
                 print('Report this error to him: {}'.format(error))
 
     print('Retrieved data for {} records out of {} records asked for.\n'
           .format(len(page_sources), len(urls)))
     for page_source in page_sources:
+        roll_no = page_sources.index(page_source) + lower_limit
         try:
             if page_source and page_source.status_code == 200:
-                roll_no = page_source.url[page_source.url.find('=') + 1:page_source.url.find('&')]
                 data = parser(page_source.text)
                 cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, '
                                'Number_of_subjects) VALUES (?, ?, ?, ?, ?, ?)',
@@ -121,7 +122,7 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
         except IndexError:
             print('Result not found for this Roll Number-School Code combination: {}-{}'.format(roll_no, school_code))
         except Exception as error:
-            print('Some unknown, unexpected error has been thrown, call the developer. AAAAHHHHHH')
+            print('AAAAHHHHHH. Roll No. {} threw an unknown, unexpected error, call the developer.'.format(roll_no))
             print('Report this error to him: {}'.format(error))
 
     database_conn.commit()
