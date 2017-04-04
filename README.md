@@ -1,4 +1,4 @@
-##CBSE Resultomator
+## CBSE Resultomator
 
 A script to automate the process of generating data viz on basis of data from the CBSE results site.
 Currently supports only 12th Grade results.
@@ -10,7 +10,7 @@ More than just a bet this time.
 **Incompatible with Python 2, Uses Python 3.**
 
 
-##Speed Benchmarking -
+## Speed Benchmarking -
 
 **Tests were done on a regular home network (40-50 mbps) and generic config.**
 
@@ -24,7 +24,7 @@ Took 13.299899101257324 seconds for execution
 
 ```
 
-##License
+## License
 
 This code ("code" referring to all files in this repository) is licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 Detailed [Legal Code](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) is also attached as LICENSE.md
