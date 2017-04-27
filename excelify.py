@@ -9,6 +9,23 @@ import json
 from xlsxwriter.utility import xl_range
 
 
+def get_best(student_marks):
+    print(student_marks)
+    to_remove = list()
+    for x in range(len(student_marks)):
+        print(x)
+        if type(student_marks[x]) != int:
+            to_remove.append(x)
+    to_remove.sort(reverse=True)
+    for x in to_remove:
+        print(x)
+        student_marks.pop(x)
+    print(student_marks)
+    student_marks.sort(reverse=True)
+    print(student_marks)
+    return sum(student_marks[:5]) / 5
+
+
 def excelify():
     db_conn = sqlite3.connect('clean_data.sqlite')
     db_cursor = db_conn.cursor()
@@ -37,7 +54,7 @@ def excelify():
 
     main_worksheet.set_column(0, 0, 15)
     main_worksheet.set_column(1, 3, 30)
-    main_worksheet.set_column(4, 2 * number_of_subjects + 5, 20)
+    main_worksheet.set_column(4, 2 * number_of_subjects + 7, 20)
     main_worksheet.set_row(0, 20, main_heading_format)
     main_worksheet.set_row(1, 20, main_heading_format)
 
@@ -135,16 +152,26 @@ def excelify():
         sub_worksheet.write(stats_row_num + 1, 3, '=COUNTIF({}, "<33")'
                             .format(sub_marks_range), sub_center_align_format)
 
+    student_total_index = subject_index * 2 + 9
+    main_worksheet.write(0, student_total_index, 'Student Total')
+
     for student_index in range(number_of_students):
         main_worksheet.set_row(student_index + 3, 18, main_left_align_format)
         main_worksheet.write_row(student_index + 3, 0, student_data[student_index][:-1])
+        student_marks = []
         for subject_code in json.loads(student_data[student_index][-1]):
+            marks_data = subject_data[subject_code]['students'][student_data[student_index][0]]['marks']
+            grade_data = subject_data[subject_code]['students'][student_data[student_index][0]]['grade']
             main_worksheet.write(student_index + 3,
                                  all_subjects.index((subject_data[subject_code]['subject_name'], subject_code)) * 2 + 6,
-                                 subject_data[subject_code]['students'][student_data[student_index][0]]['marks'])
+                                 marks_data)
+            student_marks.append(marks_data)
             main_worksheet.write(student_index + 3,
                                  all_subjects.index((subject_data[subject_code]['subject_name'], subject_code)) * 2 + 7,
-                                 subject_data[subject_code]['students'][student_data[student_index][0]]['grade'])
+                                 grade_data)
+        main_worksheet.write(student_index + 3, student_total_index, get_best(student_marks))
+    main_worksheet.set_row(row_num + 5, 30)
+    main_worksheet.merge_range(number_of_students + 5, 0, number_of_students + 5, 4, 'Statistics', main_heading_format)
 
     main_workbook.close()
     subject_workbook.close()
@@ -153,3 +180,5 @@ def excelify():
 
 if __name__ == '__main__':
     excelify()
+
+# TODO: Edit best calculation algorithm to account for Eng + best 4
