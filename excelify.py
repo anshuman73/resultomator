@@ -9,21 +9,15 @@ import json
 from xlsxwriter.utility import xl_range
 
 
-def get_best(student_marks):
-    print(student_marks)
+def get_best(english_marks, student_marks):
     to_remove = list()
     for x in range(len(student_marks)):
-        print(x)
         if type(student_marks[x]) != int:
             to_remove.append(x)
-    to_remove.sort(reverse=True)
+    to_remove.sort(reverse=True)  # Sorting required as the changing indexes don't mess up the process
     for x in to_remove:
-        print(x)
         student_marks.pop(x)
-    print(student_marks)
-    student_marks.sort(reverse=True)
-    print(student_marks)
-    return sum(student_marks[:5]) / 5
+    return (english_marks + sum(sorted(student_marks, reverse=True)[:4])) / 5
 
 
 def excelify():
@@ -158,18 +152,22 @@ def excelify():
     for student_index in range(number_of_students):
         main_worksheet.set_row(student_index + 3, 18, main_left_align_format)
         main_worksheet.write_row(student_index + 3, 0, student_data[student_index][:-1])
-        student_marks = []
+        student_marks = list()
+        english_marks = None
         for subject_code in json.loads(student_data[student_index][-1]):
             marks_data = subject_data[subject_code]['students'][student_data[student_index][0]]['marks']
             grade_data = subject_data[subject_code]['students'][student_data[student_index][0]]['grade']
             main_worksheet.write(student_index + 3,
                                  all_subjects.index((subject_data[subject_code]['subject_name'], subject_code)) * 2 + 6,
                                  marks_data)
-            student_marks.append(marks_data)
+            if 'English' in subject_data[subject_code]['subject_name']:
+                english_marks = marks_data
+            else:
+                student_marks.append(marks_data)
             main_worksheet.write(student_index + 3,
                                  all_subjects.index((subject_data[subject_code]['subject_name'], subject_code)) * 2 + 7,
                                  grade_data)
-        main_worksheet.write(student_index + 3, student_total_index, get_best(student_marks))
+        main_worksheet.write(student_index + 3, student_total_index, get_best(english_marks, student_marks))
     main_worksheet.set_row(row_num + 5, 30)
     main_worksheet.merge_range(number_of_students + 5, 0, number_of_students + 5, 4, 'Statistics', main_heading_format)
 
