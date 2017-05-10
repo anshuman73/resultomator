@@ -9,14 +9,13 @@ import json
 from xlsxwriter.utility import xl_range
 
 
+def convert_to_int(string):
+    return int('0' + ''.join([char for char in string if char.isdigit()]).strip())
+
+
 def get_best(english_marks, student_marks):
-    to_remove = list()
-    for x in range(len(student_marks)):
-        if type(student_marks[x]) != int:
-            to_remove.append(x)
-    to_remove.sort(reverse=True)  # Sorting required as the changing indexes don't mess up the process
-    for x in to_remove:
-        student_marks.pop(x)
+    english_marks = convert_to_int(str(english_marks))
+    student_marks = [convert_to_int(str(marks)) for marks in student_marks]
     return (english_marks + sum(sorted(student_marks, reverse=True)[:4])) / 5
 
 
@@ -179,4 +178,4 @@ def excelify():
 if __name__ == '__main__':
     excelify()
 
-# TODO: Edit best calculation algorithm to account for Eng + best 4
+# TODO: Add support to enter marks with text in case of fail in the best of 5 thingy.
