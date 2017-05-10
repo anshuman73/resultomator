@@ -11,3 +11,8 @@
 # Ignore pycache files and byte-code compiled files
 __pycache__/
 *.pyc
+
+# Ignore test text files (required txts will be still added)
+*.txt
+!requirements.txt
+!subject_codes.txt
