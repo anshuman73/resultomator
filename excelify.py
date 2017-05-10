@@ -58,7 +58,7 @@ def excelify():
     main_worksheet.write(0, 4, 'Final Result')
 
     subject_data = dict()
-
+    subject_index = None  # Helps avoid warning and also error detection (Highly improbable)
     for subject, code in all_subjects:
         subject_index = all_subjects.index((subject, code))
         sub_worksheet = subject_workbook.add_worksheet(str(subject))
@@ -177,5 +177,3 @@ def excelify():
 
 if __name__ == '__main__':
     excelify()
-
-# TODO: Add support to enter marks with text in case of fail in the best of 5 thingy.
