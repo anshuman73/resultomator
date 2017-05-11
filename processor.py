@@ -54,9 +54,10 @@ def split_result_data(result_data):
     return [result_data[i:i+13].strip() for i in range(0, len(result_data), 13)]
 
 
-def process():
-    txt_file_data = open('results.txt').readlines()
+def process(file_address):
+    txt_file_data = open(file_address).readlines()
     data = clean_data(txt_file_data)
+    print('Found data for {} students\n'.format(len(data)))
     for line in data:
         line = line.split('    ', maxsplit=1)
         student_data = line[0].strip().split(' ', maxsplit=1)
@@ -86,7 +87,7 @@ def process():
 
     database_conn.commit()
     database_conn.close()
-
+    print('Saved data for {} students\n'.format(len(data)))
 
 if __name__ == '__main__':
-    process()
+    process(str(input('Enter the location of the text file received in the E-Mail: ')))

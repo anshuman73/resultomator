@@ -55,7 +55,7 @@ def parser(html):
     marks_table_subjects = result_data_tr[1:-1]
     for subject_tr in marks_table_subjects:
         if len(subject_tr.findAll('td')) > 1:
-            subject_marks = {}
+            subject_marks = dict()
             for index, sub_details in enumerate(subject_tr.findAll('td')):
                 subject_marks[marks_table_index[index]] = ''.join(sub_details.findAll(text=True)).strip()
             marks.append(subject_marks)
@@ -68,7 +68,27 @@ def parser(html):
     return data
 
 
-def extract(school_code, lower_limit, upper_limit, net_choice):
+def process_range(string_inp):
+    final_range = list()
+    string_inp = string_inp.split(',')
+    for inp in string_inp:
+        if '-' in inp:
+            inp = inp.split('-')
+            try:
+                final_range.extend(range(int(inp[0].strip()), int(inp[1].strip()) + 1))
+            except ValueError:
+                print('Invalid input {} ignored'.format(str(inp)))
+        else:
+            try:
+                final_range.append(int(inp.strip()))
+            except ValueError:
+                print('Invalid input {} ignored'.format(str(inp)))
+    final_range.sort()
+    return final_range
+
+
+def extract(school_code, roll_no_range, net_choice):
+    roll_no_range = process_range(roll_no_range)
     if net_choice == 'y':
         net_choice = True
     elif net_choice == 'n':
@@ -77,11 +97,12 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
         print('\nIncorrect Network mode chosen, defaulting to non-async\n')
         net_choice = False
     count = 0
-    headers = {'Referer': 'http://cbseresults.nic.in/class12/cbse1216.htm', 'Upgrade-Insecure-grequests': '1',
-               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)'
+    headers = {'Referer': 'http://resultsarchives.nic.in/cbseresults/cbseresults2016/class12/cbse1216.htm',
+               'Upgrade-Insecure-grequests': '1',
+               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
                              'Chrome/53.0.2785.116 Safari/537.36'}
-    urls = ['http://cbseresults.nic.in/class12/cbse1216.asp?regno={}&schcode={}&B1=Submit'
-            .format(roll_no, school_code) for roll_no in range(lower_limit, upper_limit + 1)]
+    urls = ['http://resultsarchives.nic.in/cbseresults/cbseresults2016/class12/cbse1216.asp?regno={}&schcode={}'
+            '&B1=Submit'.format(roll_no, school_code) for roll_no in roll_no_range]
     print('Retrieving data for {} students, may take a few seconds depending on the network\n'.format(len(urls)))
     if net_choice:
         responses = (grequests.get(u, headers=headers) for u in urls)
@@ -102,7 +123,7 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
     print('Retrieved data for {} records out of {} records asked for.\n'
           .format(len(page_sources), len(urls)))
     for page_source in page_sources:
-        roll_no = page_sources.index(page_source) + lower_limit
+        roll_no = roll_no_range[page_sources.index(page_source)]
         try:
             if page_source and page_source.status_code == 200:
                 data = parser(page_source.text)
@@ -127,15 +148,13 @@ def extract(school_code, lower_limit, upper_limit, net_choice):
 
     database_conn.commit()
     database_conn.close()
-    print('{} valid records downloaded and saved in the range {} to {} (both inclusive),'
-          .format(count, lower_limit, upper_limit))
+    print('{} valid records downloaded and saved'.format(count))
 
 
 if __name__ == '__main__':  # Allows to use it as standalone, for demonstration purposes
 
-    schcode = int(input('Enter the School Code: '))
-    lwr = int(input('Enter the lower limit of the Roll Numbers: '))
-    upr = int(input('Enter the upper limit of the Roll Numbers: '))
+    schcode = input('Enter the School Code: ')
+    roll_range = input('Enter range of roll numbers. Use "-" for entering ranges and use "," to separate inputs: ')
     net_ch = input('Go async mode for network requests ? (Y/N): ').strip().lower()
 
-    extract(schcode, lwr, upr, net_ch)
+    extract(schcode, roll_range, net_ch)
