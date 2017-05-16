@@ -5,38 +5,18 @@ Licensed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.
 
 import sqlite3
 
-database_conn = sqlite3.connect('raw_data.sqlite')
-cursor = database_conn.cursor()
-cursor.executescript('''
-                    DROP TABLE IF EXISTS Records;
-                    DROP TABLE IF EXISTS Marks;
-                    CREATE TABLE IF NOT EXISTS Records (
-                        Roll_Number        INTEGER PRIMARY KEY,
-                        Name               TEXT,
-                        Father_Name        TEXT,
-                        Mother_Name        TEXT,
-                        Final_Result       TEXT,
-                        Number_of_subjects INTEGER
-                        );
-                    CREATE TABLE IF NOT EXISTS Marks (
-                        Roll_Number INTEGER,
-                        Subject_Code    TEXT,
-                        Subject_Name    TEXT,
-                        Theory_Marks    INTEGER,
-                        Practical_Marks INTEGER,
-                        Total_Marks     INTEGER,
-                        Grade           TEXT
-                        )
-                    ''')
 
-
-# Generate a dictionary to use from a text file which has codes vs subject for all CBSE subjects.
-# Obtained from http://cbseacademic.in/web_material/Curriculum/SrSecondary/2014_XII_Subject_Code_List.pdf
-subject_names = dict()
-sub_code_data = open('subject_codes.txt').readlines()
-for subject in sub_code_data:
-    subject = subject.split(maxsplit=2)
-    subject_names[subject[1].strip()] = subject[2].strip()
+def get_subject_names():
+    # Generate a dictionary to use from a text file which has codes vs subject for all CBSE subjects.
+    # Obtained from http://cbseacademic.in/web_material/Curriculum/SrSecondary/2014_XII_Subject_Code_List.pdf
+    names = dict()
+    subject_codes_file = open('subject_codes.txt')
+    sub_code_data = subject_codes_file.readlines()
+    for subject in sub_code_data:
+        subject = subject.split(maxsplit=2)
+        names[subject[1].strip()] = subject[2].strip()
+    subject_codes_file.close()
+    return names
 
 
 def clean_data(text_data):
@@ -55,7 +35,34 @@ def split_result_data(result_data):
 
 
 def process(file_address):
-    txt_file_data = open(file_address).readlines()
+    database_conn = sqlite3.connect('raw_data.sqlite')
+    cursor = database_conn.cursor()
+    cursor.executescript('''
+                        DROP TABLE IF EXISTS Records;
+                        DROP TABLE IF EXISTS Marks;
+                        CREATE TABLE IF NOT EXISTS Records (
+                            Roll_Number        INTEGER PRIMARY KEY,
+                            Name               TEXT,
+                            Father_Name        TEXT,
+                            Mother_Name        TEXT,
+                            Final_Result       TEXT,
+                            Number_of_subjects INTEGER
+                            );
+                        CREATE TABLE IF NOT EXISTS Marks (
+                            Roll_Number INTEGER,
+                            Subject_Code    TEXT,
+                            Subject_Name    TEXT,
+                            Theory_Marks    INTEGER,
+                            Practical_Marks INTEGER,
+                            Total_Marks     INTEGER,
+                            Grade           TEXT
+                            )
+                        ''')
+
+    subject_names = get_subject_names()
+
+    txt_file = open(file_address)
+    txt_file_data = txt_file.readlines()
     data = clean_data(txt_file_data)
     print('Found data for {} students\n'.format(len(data)))
     for line in data:
@@ -85,6 +92,7 @@ def process(file_address):
                        'Number_of_subjects) VALUES (?, ?, ?, ?, ?, ?)',
                        (roll_no, student_name, '', '', final_result, subject_count,))
 
+    txt_file.close()
     database_conn.commit()
     database_conn.close()
     print('Saved data for {} students\n'.format(len(data)))

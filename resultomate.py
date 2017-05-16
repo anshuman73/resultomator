@@ -8,6 +8,7 @@ import network_processor
 import file_processor
 import data_cleaner
 import excelify
+import os
 
 
 def resultomate():
@@ -39,6 +40,10 @@ def resultomate():
 
     print('\nDumping data to excel files...\n')
     excelify.excelify()
+
+    print('\nDeleting databases')
+    [os.remove(db_file) for db_file in os.listdir(os.getcwd()) if db_file.endswith('.sqlite')]
+    print('All databases deleted !\n')
 
     print('\nFinished processing everything.')
     print('Took {} seconds for execution\n'.format(time() - st))

@@ -9,31 +9,6 @@ from bs4 import BeautifulSoup
 import sqlite3
 
 
-database_conn = sqlite3.connect('raw_data.sqlite')
-cursor = database_conn.cursor()
-cursor.executescript('''
-                    DROP TABLE IF EXISTS Records;
-                    DROP TABLE IF EXISTS Marks;
-                    CREATE TABLE IF NOT EXISTS Records (
-                        Roll_Number        INTEGER PRIMARY KEY,
-                        Name               TEXT,
-                        Father_Name        TEXT,
-                        Mother_Name        TEXT,
-                        Final_Result       TEXT,
-                        Number_of_subjects INTEGER
-                        );
-                    CREATE TABLE IF NOT EXISTS Marks (
-                        Roll_Number INTEGER,
-                        Subject_Code    TEXT,
-                        Subject_Name    TEXT,
-                        Theory_Marks    INTEGER,
-                        Practical_Marks INTEGER,
-                        Total_Marks     INTEGER,
-                        Grade           TEXT
-                        )
-                    ''')
-
-
 def parser(html):
     html = ''.join(html.split('\n')[67:])
     data = dict()
@@ -88,6 +63,30 @@ def process_range(string_inp):
 
 
 def process(school_code, roll_no_range, net_choice):
+    database_conn = sqlite3.connect('raw_data.sqlite')
+    cursor = database_conn.cursor()
+    cursor.executescript('''
+                        DROP TABLE IF EXISTS Records;
+                        DROP TABLE IF EXISTS Marks;
+                        CREATE TABLE IF NOT EXISTS Records (
+                            Roll_Number        INTEGER PRIMARY KEY,
+                            Name               TEXT,
+                            Father_Name        TEXT,
+                            Mother_Name        TEXT,
+                            Final_Result       TEXT,
+                            Number_of_subjects INTEGER
+                            );
+                        CREATE TABLE IF NOT EXISTS Marks (
+                            Roll_Number INTEGER,
+                            Subject_Code    TEXT,
+                            Subject_Name    TEXT,
+                            Theory_Marks    INTEGER,
+                            Practical_Marks INTEGER,
+                            Total_Marks     INTEGER,
+                            Grade           TEXT
+                            )
+                        ''')
+
     roll_no_range = process_range(roll_no_range)
     if net_choice == 'y':
         net_choice = True
