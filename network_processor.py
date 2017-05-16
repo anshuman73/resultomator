@@ -87,7 +87,7 @@ def process_range(string_inp):
     return final_range
 
 
-def extract(school_code, roll_no_range, net_choice):
+def process(school_code, roll_no_range, net_choice):
     roll_no_range = process_range(roll_no_range)
     if net_choice == 'y':
         net_choice = True
@@ -157,4 +157,4 @@ if __name__ == '__main__':  # Allows to use it as standalone, for demonstration 
     roll_range = input('Enter range of roll numbers. Use "-" for entering ranges and use "," to separate inputs: ')
     net_ch = input('Go async mode for network requests ? (Y/N): ').strip().lower()
 
-    extract(schcode, roll_range, net_ch)
+    process(schcode, roll_range, net_ch)

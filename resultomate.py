@@ -4,9 +4,9 @@ Licensed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.
 """
 
 from time import time
-import extractor
-import processor
-import cleaner
+import network_processor
+import file_processor
+import data_cleaner
 import excelify
 
 
@@ -23,18 +23,18 @@ def resultomate():
         net_choice = str(input('Go async mode for network requests ? (Y/N): ')).strip().lower()
         st = time()
         print('\n\nLog: \n')
-        extractor.extract(schcode, roll_range, net_choice)
+        network_processor.process(schcode, roll_range, net_choice)
         print('\nData retrieval from network and saving raw data into database took {} seconds'.format(time() - st))
     elif method_choice == 2:
         file_address = str(input('Enter the location of the text file received in the E-Mail: '))
         st = time()
         print('\n\nLog: \n')
-        processor.process(file_address)
+        file_processor.process(file_address)
 
     print('\n\nSaved Raw data in a Database.\n')
 
     print('\nProcessing and Normalizing data...\n')
-    cleaner.clean()
+    data_cleaner.clean()
     print('\nData successfully Normalized\n')
 
     print('\nDumping data to excel files...\n')
