@@ -4,14 +4,13 @@ Licensed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.
 """
 
 from time import time
-import os
 import extractor
 import processor
 import cleaner
 import excelify
 
 
-def main():
+def resultomate():
     method_choice = int(input('Choose your method of retrieving data:\n1. Network Mode\n2. Using a Text (.txt) file'
                               '\n\nYour Choice: '))
     st = None
@@ -37,9 +36,6 @@ def main():
     print('\nProcessing and Normalizing data...\n')
     cleaner.clean()
     print('\nData successfully Normalized\n')
-    print('\nDeleting raw database')
-    os.remove(os.getcwd() + '/raw_data.sqlite')
-    print('Raw database deleted !\n')
 
     print('\nDumping data to excel files...\n')
     excelify.excelify()
@@ -50,4 +46,4 @@ def main():
     input('Press Enter to exit: ')
 
 if __name__ == '__main__':
-    main()
+    resultomate()
