@@ -9,13 +9,18 @@ import json
 from xlsxwriter.utility import xl_range
 
 
-def convert_to_int(string):
-    return int('0' + ''.join([char for char in string if char.isdigit()]).strip())
+def clean_marks(string):
+    try:
+        return int(''.join([char for char in str(string) if char.isdigit()]).strip())
+    except ValueError:
+        return ''
 
 
 def get_best(english_marks, student_marks):
-    english_marks = convert_to_int(str(english_marks))
-    student_marks = [convert_to_int(str(marks)) for marks in student_marks]
+    english_marks = clean_marks(english_marks)
+    if english_marks == '':  # Required as in case of absenteeism, english marks may be an empty string
+        english_marks = 0
+    student_marks = [clean_marks(marks) for marks in student_marks if clean_marks(marks) != '']
     return (english_marks + sum(sorted(student_marks, reverse=True)[:4])) / 5
 
 
@@ -83,10 +88,11 @@ def excelify():
 
         db_cursor.execute('SELECT sub.Roll_Number, stud.Name, sub.Theory_Marks, sub.Practical_Marks, sub.Total_Marks,'
                           'sub.Grade FROM _{} sub JOIN Students stud ON sub.Roll_Number = stud.Roll_Number '
-                          'ORDER BY sub.Total_Marks DESC, sub.Grade ASC, stud.Name ASC'.format(code))
-        students_details = db_cursor.fetchall()
-        number_of_students = len(students_details)
-        for row_num in range(number_of_students):
+                          'ORDER BY sub.Grade ASC, sub.Total_Marks DESC, stud.Name ASC'.format(code))
+        students_details = [list(result) for result in db_cursor.fetchall()]
+        number_of_subject_students = len(students_details)
+        for row_num in range(number_of_subject_students):
+            students_details[row_num][4] = clean_marks(students_details[row_num][4])  # Required to remove fail chars
             sub_worksheet.set_row(row_num + 2, 18)
             sub_worksheet.write_row(row_num + 2, 0, students_details[row_num][:2], sub_left_align_format)
             sub_worksheet.write_row(row_num + 2, 2, students_details[row_num][2:], sub_center_align_format)
@@ -109,7 +115,7 @@ def excelify():
                 sub_worksheet.merge_range(stats_row_num + x, y, stats_row_num + x, y + 2, '')
         stats_row_num += 1
         sub_worksheet.write(stats_row_num, 0, 'Total Number of students appeared', sub_left_align_format)
-        sub_worksheet.write(stats_row_num, 3, number_of_students, sub_center_align_format)
+        sub_worksheet.write(stats_row_num, 3, number_of_subject_students, sub_center_align_format)
         sub_worksheet.write(stats_row_num + 1, 0, 'Maximum Marks achieved', sub_left_align_format)
         sub_worksheet.write(stats_row_num + 1, 3, '=MAX({})'.format(sub_marks_range),
                             sub_center_align_format)
@@ -146,7 +152,7 @@ def excelify():
                             .format(sub_marks_range), sub_center_align_format)
 
     student_total_index = subject_index * 2 + 9
-    main_worksheet.write(0, student_total_index, 'Student Total')
+    main_worksheet.write(0, student_total_index, 'Student Average')
 
     for student_index in range(number_of_students):
         main_worksheet.set_row(student_index + 3, 18, main_left_align_format)
@@ -167,7 +173,7 @@ def excelify():
                                  all_subjects.index((subject_data[subject_code]['subject_name'], subject_code)) * 2 + 7,
                                  grade_data)
         main_worksheet.write(student_index + 3, student_total_index, get_best(english_marks, student_marks))
-    main_worksheet.set_row(row_num + 5, 30)
+    main_worksheet.set_row(number_of_students + 5, 30)
     main_worksheet.merge_range(number_of_students + 5, 0, number_of_students + 5, 4, 'Statistics', main_heading_format)
 
     main_workbook.close()
