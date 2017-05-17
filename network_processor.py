@@ -5,6 +5,7 @@ Licensed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.
 
 import grequests
 import requests
+from requests.exceptions import ConnectionError
 from bs4 import BeautifulSoup
 import sqlite3
 
@@ -112,7 +113,7 @@ def process(school_code, roll_no_range, net_choice):
             roll_no = url[url.find('=') + 1:url.find('&')]
             try:
                 page_sources.append(requests.get(url, headers=headers))
-            except requests.exceptions.ConnectionError:
+            except ConnectionError:
                 page_sources.append(None)
             except Exception as error:
                 page_sources.append(None)
