@@ -117,12 +117,12 @@ def excelify():
         sub_worksheet.write(stats_row_num, 0, 'Total Number of students appeared', sub_left_align_format)
         sub_worksheet.write(stats_row_num, 3, number_of_subject_students, sub_center_align_format)
         sub_worksheet.write(stats_row_num + 1, 0, 'Maximum Marks achieved', sub_left_align_format)
-        sub_worksheet.write(stats_row_num + 1, 3, '=MAX({})'.format(sub_marks_range),
-                            sub_center_align_format)
+        sub_worksheet.write(stats_row_num + 1, 3, '=MAX({})'.format(sub_marks_range), sub_center_align_format)
         sub_worksheet.write(stats_row_num + 2, 0, 'Minimum Marks achieved', sub_left_align_format)
-        sub_worksheet.write(stats_row_num + 2, 3, '=MIN({})'.format(sub_marks_range),
-                            sub_center_align_format)
-        stats_row_num += 3
+        sub_worksheet.write(stats_row_num + 2, 3, '=MIN({})'.format(sub_marks_range), sub_center_align_format)
+        sub_worksheet.write(stats_row_num + 3, 0, 'Average marks', sub_left_align_format)
+        sub_worksheet.write(stats_row_num + 3, 3, '=AVERAGE({})'.format(sub_marks_range), sub_center_align_format)
+        stats_row_num += 5
         for possible_grade in possible_grades:
             sub_worksheet.write(stats_row_num, 0, 'Number of {} s'.format(possible_grade),
                                 sub_left_align_format)
