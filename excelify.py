@@ -242,6 +242,7 @@ def excelify():
                              .format(main_marks_range), main_center_align_format)
 
     final_stats_row_num = main_stats_row_num - 21
+    main_worksheet.set_column(student_average_index - 1, student_average_index - 1, 35)
     main_worksheet.write(final_stats_row_num, student_average_index - 1, 'Number of students', main_heading_format)
     main_worksheet.write(final_stats_row_num, student_average_index, number_of_students, main_heading_format)
     main_worksheet.write(final_stats_row_num + 1, student_average_index - 1, 'Highest Average', main_heading_format)
@@ -250,8 +251,20 @@ def excelify():
     main_worksheet.write(final_stats_row_num + 2, student_average_index - 1, 'Lowest Average', main_heading_format)
     main_worksheet.write(final_stats_row_num + 2, student_average_index, '=MIN({})'.format(student_average_range),
                          main_heading_format)
-    main_worksheet.write(final_stats_row_num + 3, student_average_index - 1, 'School Average', main_heading_format)
-    main_worksheet.write(final_stats_row_num + 3, student_average_index, '=AVERAGE({})'.format(student_average_range),
+    main_worksheet.write(final_stats_row_num + 3, student_average_index - 1, 'No. of students with Average >= 95',
+                         main_heading_format)
+    main_worksheet.write(final_stats_row_num + 3, student_average_index, '=COUNTIF({}, ">=95")'
+                         .format(student_average_range), main_heading_format)
+    main_worksheet.write(final_stats_row_num + 4, student_average_index - 1, 'No. of students with Average >= 90',
+                         main_heading_format)
+    main_worksheet.write(final_stats_row_num + 4, student_average_index, '=COUNTIF({}, ">=90")'
+                     .format(student_average_range), main_heading_format)
+    main_worksheet.write(final_stats_row_num + 5, student_average_index - 1, 'No. of students with Average >= 75',
+                         main_heading_format)
+    main_worksheet.write(final_stats_row_num + 5, student_average_index, '=COUNTIF({}, ">=75")'
+                     .format(student_average_range), main_heading_format)
+    main_worksheet.write(final_stats_row_num + 7, student_average_index - 1, 'School Average', main_heading_format)
+    main_worksheet.write(final_stats_row_num + 7, student_average_index, '=AVERAGE({})'.format(student_average_range),
                          main_heading_format)
 
     main_workbook.close()
