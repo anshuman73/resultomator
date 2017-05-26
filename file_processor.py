@@ -21,7 +21,7 @@ def get_subject_names():
 
 def clean_data(text_data):
     clean_txt_data = list()
-    for line in text_data:
+    for line in text_data.split('\n'):
         try:
             int(line.split(' ')[0])
             clean_txt_data.append(line.strip())
@@ -30,8 +30,21 @@ def clean_data(text_data):
     return clean_txt_data
 
 
-def split_result_data(result_data):
-    return [result_data[i:i+13].strip() for i in range(0, len(result_data), 13)]
+def extract_metadata(file_data):
+    school_data = file_data[file_data.find(':', file_data.find('\nSCHOOL')) + 1:
+                            file_data.find('\n', file_data.find(':', file_data.find('\nSCHOOL')))].split(maxsplit=1)
+    school_code = school_data[0].strip()
+    school_name = school_data[1].strip().title()
+
+    index_start = file_data.find('SUB', file_data.find('CANDIDATE NAME'))
+    index_end = file_data.find('SUB', index_start + 1)
+    subject_split_index = index_end - index_start
+
+    return school_name, school_code, subject_split_index
+
+
+def split_result_data(result_data, subject_split_index=15):
+    return [result_data[i:i + subject_split_index].strip() for i in range(0, len(result_data), subject_split_index)]
 
 
 def process(file_address):
@@ -62,16 +75,19 @@ def process(file_address):
     subject_names = get_subject_names()
 
     txt_file = open(file_address)
-    txt_file_data = txt_file.readlines()
+    txt_file_data = txt_file.read()
+    school_name, school_code, subject_split_index = extract_metadata(txt_file_data)
     data = clean_data(txt_file_data)
+    print('Data found for {} (School Code - {})\n'.format(school_name, school_code))
     print('Found data for {} students\n'.format(len(data)))
     for line in data:
         line = line.split('    ', maxsplit=1)
         student_data = line[0].strip().split(' ', maxsplit=1)
-        result_data = split_result_data(''.join(line[1:]).strip())
+        results_data = ''.join(line[1:]).strip().split('     ')
+        final_result = results_data[1][-4:]
+        result_data = split_result_data(''.join(results_data[:-1]), subject_split_index)
         roll_no = student_data[0]
         student_name = student_data[1]
-        final_result = result_data.pop()[-4:]
         subject_count = 0
         for subject_data in result_data:
             subject_data = subject_data.split()
