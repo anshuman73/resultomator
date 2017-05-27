@@ -11,7 +11,7 @@ def get_subject_names():
     # Generate a dictionary to use from a text file which has codes vs subject for all CBSE subjects.
     # Obtained from http://cbseacademic.in/web_material/Curriculum/SrSecondary/2014_XII_Subject_Code_List.pdf
     names = dict()
-    subject_codes_file = open(os.environ['OPENSHIFT_DATA_DIR'] + 'subject_codes.txt')
+    subject_codes_file = open(os.environ['OPENSHIFT_DATA_DIR'] + 'subject_codes.txt', encoding='utf-8')
     sub_code_data = subject_codes_file.readlines()
     for subject in sub_code_data:
         subject = subject.split(maxsplit=2)
