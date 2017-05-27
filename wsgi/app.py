@@ -6,7 +6,7 @@ import os
 from flask import Flask, request, redirect, url_for, render_template, flash
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = os.environ['OPENSHIFT_DATA_DIR'] + '/txt_files'
+UPLOAD_FOLDER = os.environ['OPENSHIFT_DATA_DIR'] + 'txt_files'
 ALLOWED_EXTENSIONS = ['txt']
 
 app = Flask(__name__)
