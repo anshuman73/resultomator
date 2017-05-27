@@ -29,9 +29,9 @@ def excelify():
     db_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'clean_data.sqlite')
     db_cursor = db_conn.cursor()
 
-    main_workbook = xlsxwriter.Workbook('All CBSE 12th results.xlsx')
+    main_workbook = xlsxwriter.Workbook(os.environ['OPENSHIFT_DATA_DIR'] + 'All CBSE 12th results.xlsx')
     main_worksheet = main_workbook.add_worksheet("Results")
-    subject_workbook = xlsxwriter.Workbook('CBSE 12th Subject-wise results.xlsx')
+    subject_workbook = xlsxwriter.Workbook(os.environ['OPENSHIFT_DATA_DIR'] + 'CBSE 12th Subject-wise results.xlsx')
 
     main_heading_format = main_workbook.add_format({'bold': True, 'align': 'center', 'valign': 'vcenter',
                                                     'font_size': 13})
