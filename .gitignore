@@ -1,0 +1,18 @@
+# Ignore any locally generated sqlite files for testing
+*.sqlite
+
+# Ignore Excel files created while testing
+*.xlsx
+*.xls
+
+# Ignore PyCharm files
+.idea/
+
+# Ignore pycache files and byte-code compiled files
+__pycache__/
+*.pyc
+
+# Ignore test text files (required txts will be still added)
+*.txt
+!requirements.txt
+!subject_codes.txt
