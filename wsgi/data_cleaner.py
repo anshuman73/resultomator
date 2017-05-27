@@ -5,12 +5,13 @@ Licensed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.
 
 import sqlite3
 import json
+import os
 
 
 def clean():
-    raw_db_conn = sqlite3.connect('raw_data.sqlite')
+    raw_db_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'raw_data.sqlite')
     raw_db_cursor = raw_db_conn.cursor()
-    clean_db_conn = sqlite3.connect('clean_data.sqlite')
+    clean_db_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'clean_data.sqlite')
     clean_db_cursor = clean_db_conn.cursor()
     # Delete existing tables if a db exists already
     clean_db_cursor.execute('SELECT name FROM sqlite_master WHERE type="table"')

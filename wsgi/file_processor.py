@@ -4,6 +4,7 @@ Licensed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.
 """
 
 import sqlite3
+import os
 
 
 def get_subject_names():
@@ -48,7 +49,7 @@ def split_result_data(result_data, subject_split_index=15):
 
 
 def process(file_address):
-    database_conn = sqlite3.connect('raw_data.sqlite')
+    database_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'raw_data.sqlite')
     cursor = database_conn.cursor()
     cursor.executescript('''
                         DROP TABLE IF EXISTS Records;

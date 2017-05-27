@@ -7,6 +7,7 @@ import xlsxwriter
 import sqlite3
 import json
 from xlsxwriter.utility import xl_range
+import os
 
 
 def clean_marks(string):
@@ -25,7 +26,7 @@ def get_best(english_marks, student_marks):
 
 
 def excelify():
-    db_conn = sqlite3.connect('clean_data.sqlite')
+    db_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'clean_data.sqlite')
     db_cursor = db_conn.cursor()
 
     main_workbook = xlsxwriter.Workbook('All CBSE 12th results.xlsx')
