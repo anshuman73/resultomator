@@ -1,7 +1,7 @@
-import network_processor
-import file_processor
-import data_cleaner
-import excelify
+from wsgi import network_processor
+from wsgi import file_processor
+from wsgi import data_cleaner
+from wsgi import excelify
 
 from flask import Flask, render_template, request
 
@@ -17,7 +17,7 @@ def form():
 def result():
     if request.method == 'POST':
         results = request.form.to_dict()
-        #file_processor.process(file_address)
+        file_processor.process(file_address)
         return render_template("results.html", results=results)
     else:
         return 'NOT ALLOWED !'
