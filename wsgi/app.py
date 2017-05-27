@@ -41,9 +41,12 @@ def result():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
+            file_address = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_address)
+            file_processor.process(file_address)
+            data_cleaner.clean()
+            excelify.excelify()
+            return "Uploaded"
     else:
         return 'NOT ALLOWED !'
 
