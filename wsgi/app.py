@@ -51,12 +51,12 @@ def result():
 
 
 @app.route('/download1', methods=['GET', 'POST'])
-def download1():
+def School_Results():
     return send_from_directory(directory=os.environ['OPENSHIFT_DATA_DIR'], filename='All CBSE 12th results.xlsx')
 
 
 @app.route('/download2', methods=['GET', 'POST'])
-def download2():
+def Subject_Results():
     return send_from_directory(directory=os.environ['OPENSHIFT_DATA_DIR'], filename='CBSE 12th Subject-wise results.xlsx')
 
 
