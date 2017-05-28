@@ -50,12 +50,12 @@ def result():
         return 'NOT ALLOWED !'
 
 
-@app.route('/download1')
+@app.route('/download1', methods=['GET', 'POST'])
 def download1():
     return send_from_directory(directory=os.environ['OPENSHIFT_DATA_DIR'], filename='All CBSE 12th results.xlsx')
 
 
-@app.route('/download2')
+@app.route('/download2', methods=['GET', 'POST'])
 def download2():
     return send_from_directory(directory=os.environ['OPENSHIFT_DATA_DIR'], filename='CBSE 12th Subject-wise results.xlsx')
 
