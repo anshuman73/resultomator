@@ -21,10 +21,11 @@ def resultomate():
     if method_choice == 1:
         schcode = int(input('Enter the School Code: '))
         roll_range = input('Enter range of roll numbers. Use "-" for entering ranges and use "," to separate inputs: ')
+        centre_no = input('Enter the common centre number: ')
         net_choice = str(input('Go async mode for network requests ? (Y/N): ')).strip().lower()
         st = time()
         print('\n\nLog: \n')
-        network_processor.process(schcode, roll_range, net_choice)
+        network_processor.process(schcode, roll_range, centre_no, net_choice)
         print('\nData retrieval from network and saving raw data into database took {} seconds'.format(time() - st))
     elif method_choice == 2:
         file_address = str(input('Enter the location of the text file received in the E-Mail: '))

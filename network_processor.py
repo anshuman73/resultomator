@@ -11,7 +11,7 @@ import sqlite3
 
 
 def parser(html):
-    html = ''.join(html.split('\n')[67:])
+    html = ''.join(html.split('\n')[100:])
     data = dict()
     marks_table_index = list()
     marks = list()
@@ -37,7 +37,7 @@ def parser(html):
             marks.append(subject_marks)
 
     raw_result = ''.join(result_data_tr[-1].findAll('td')[1].findAll(text=True)).strip()
-    result = raw_result[raw_result.find('Result:') + len('Result:'): raw_result.rfind(':')].strip()
+    result = raw_result[raw_result.find('Result :') + len('Result :') + 1: raw_result.rfind(':')].strip()
 
     data['marks'] = marks
     data['final_result'] = result
@@ -63,7 +63,7 @@ def process_range(string_inp):
     return final_range
 
 
-def process(school_code, roll_no_range, net_choice):
+def process(school_code, roll_no_range, centre_no, net_choice):
     database_conn = sqlite3.connect('raw_data.sqlite')
     cursor = database_conn.cursor()
     cursor.executescript('''
@@ -97,22 +97,22 @@ def process(school_code, roll_no_range, net_choice):
         print('\nIncorrect Network mode chosen, defaulting to non-async\n')
         net_choice = False
     count = 0
-    headers = {'Referer': 'http://resultsarchives.nic.in/cbseresults/cbseresults2016/class12/cbse1216.htm',
+    headers = {'Referer': 'http://cbseresults.nic.in/class12npy/class12th17.htm',
                'Upgrade-Insecure-grequests': '1',
-               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                             'Chrome/53.0.2785.116 Safari/537.36'}
-    urls = ['http://resultsarchives.nic.in/cbseresults/cbseresults2016/class12/cbse1216.asp?regno={}&schcode={}'
-            '&B1=Submit'.format(roll_no, school_code) for roll_no in roll_no_range]
-    print('Retrieving data for {} students, may take a few seconds depending on the network\n'.format(len(urls)))
+               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
+                             ' Chrome/58.0.3029.110 Safari/537.36'}
+    payloads = [{'regno': roll_no, 'sch': school_code, 'cno': centre_no, 'B2': 'Submit'} for roll_no in roll_no_range]
+    base_url = 'http://cbseresults.nic.in/class12npy/class12th17.asp'
+    print('Retrieving data for {} students, may take a few seconds depending on the network\n'.format(len(payloads)))
     if net_choice:
-        responses = (grequests.get(u, headers=headers) for u in urls)
+        responses = (grequests.post(base_url, headers=headers, data=load) for load in payloads)
         page_sources = grequests.map(responses)
     else:
         page_sources = list()
-        for url in urls:
-            roll_no = url[url.find('=') + 1:url.find('&')]
+        for load in payloads:
+            roll_no = load['regno']
             try:
-                page_sources.append(requests.get(url, headers=headers))
+                page_sources.append(requests.post(base_url, headers=headers, data=load))
             except ConnectionError:
                 page_sources.append(None)
             except Exception as error:
@@ -120,8 +120,7 @@ def process(school_code, roll_no_range, net_choice):
                 print('AAAAHHHHHH. Roll No. {} threw an unknown, unexpected error, call the developer.'.format(roll_no))
                 print('Report this error to him: {}'.format(error))
 
-    print('Retrieved data for {} records out of {} records asked for.\n'
-          .format(len(page_sources), len(urls)))
+    print('Retrieved data for {} records out of {} records asked for.\n'.format(len(page_sources), len(payloads)))
     for page_source in page_sources:
         roll_no = roll_no_range[page_sources.index(page_source)]
         try:
@@ -129,8 +128,8 @@ def process(school_code, roll_no_range, net_choice):
                 data = parser(page_source.text)
                 cursor.execute('INSERT INTO Records (Roll_Number, Name, Father_Name, Mother_Name, Final_Result, '
                                'Number_of_subjects) VALUES (?, ?, ?, ?, ?, ?)',
-                               (data['Roll No:'], data['Name:'], data['Father\'s Name:'], data['Mother\'s Name:'],
-                                data['final_result'], len(data['marks']), ))
+                               (data['Roll No:'], data['Candidate Name:'], data['Father\'s Name:'],
+                                data['Mother\'s Name:'], data['final_result'], len(data['marks']), ))
                 for subject in data['marks']:
                     cursor.execute('INSERT INTO Marks (Roll_Number, Subject_Code, Subject_Name, Theory_Marks,'
                                    'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -155,6 +154,7 @@ if __name__ == '__main__':  # Allows to use it as standalone, for demonstration 
 
     schcode = input('Enter the School Code: ')
     roll_range = input('Enter range of roll numbers. Use "-" for entering ranges and use "," to separate inputs: ')
+    cen_no = input('Enter the common centre number: ')
     net_ch = input('Go async mode for network requests ? (Y/N): ').strip().lower()
 
-    process(schcode, roll_range, net_ch)
+    process(schcode, roll_range, cen_no, net_ch)
