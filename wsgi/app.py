@@ -1,9 +1,8 @@
-import network_processor
 import file_processor
 import data_cleaner
 import excelify
 import os
-from flask import Flask, request, redirect, url_for, render_template, flash
+from flask import Flask, request, redirect, url_for, render_template, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = os.environ['OPENSHIFT_DATA_DIR'] + 'txt_files'
@@ -31,14 +30,12 @@ def result():
         # return render_template("results.html", results=results)
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+             return 'No file part'
         file = request.files['file']
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+            return 'No selected file'
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_address = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -46,11 +43,24 @@ def result():
             file_processor.process(file_address)
             data_cleaner.clean()
             excelify.excelify()
-            return "Uploaded"
+            return render_template('results.html')
+        else:
+            return 'Not a .txt file'
     else:
         return 'NOT ALLOWED !'
+
+
+@app.route('/download1')
+def download1():
+    return send_from_directory(directory=os.environ['OPENSHIFT_DATA_DIR'], filename='All CBSE 12th results.xlsx')
+
+
+@app.route('/download2')
+def download2():
+    return send_from_directory(directory=os.environ['OPENSHIFT_DATA_DIR'], filename='CBSE 12th Subject-wise results.xlsx')
+
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
 if __name__ == '__main__':
-    app.run(debug=True)  # TODO: Remember to shut this off
+    app.run()  # TODO: Remember to shut this off
