@@ -7,10 +7,14 @@ import sqlite3
 import json
 import os
 
+os.environ['OPENSHIFT_DATA_DIR'] = './data'   # TODO: remove before prod
 
 def clean():
+    print(os.environ['OPENSHIFT_DATA_DIR'] + 'raw_data.sqlite')
     raw_db_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'raw_data.sqlite')
     raw_db_cursor = raw_db_conn.cursor()
+    raw_db_cursor.execute('SELECT name FROM sqlite_master WHERE type="table"')
+    print(raw_db_cursor.fetchall())
     clean_db_conn = sqlite3.connect(os.environ['OPENSHIFT_DATA_DIR'] + 'clean_data.sqlite')
     clean_db_cursor = clean_db_conn.cursor()
     # Delete existing tables if a db exists already

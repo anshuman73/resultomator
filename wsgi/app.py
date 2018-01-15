@@ -1,10 +1,11 @@
 import file_processor
+import network_processor
 import data_cleaner
 import excelify
 import os
 from flask import Flask, request, redirect, url_for, render_template, flash, send_from_directory
 from werkzeug.utils import secure_filename
-
+os.environ['OPENSHIFT_DATA_DIR'] = './'   # TODO: remove before prod
 UPLOAD_FOLDER = os.environ['OPENSHIFT_DATA_DIR'] + 'txt_files'
 ALLOWED_EXTENSIONS = ['txt']
 
@@ -46,6 +47,18 @@ def result():
             return render_template('results.html')
         else:
             return 'Not a .txt file'
+    else:
+        return 'NOT ALLOWED !'
+
+
+@app.route('/result2', methods=['POST'])
+def result2():
+    if request.method == 'POST':
+        results = request.form.to_dict()
+        network_processor.process(results['school_code'], results['roll_range'], results['centre_no'], 'useless overload')
+        data_cleaner.clean()
+        excelify.excelify()
+        return render_template('results.html')
     else:
         return 'NOT ALLOWED !'
 

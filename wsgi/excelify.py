@@ -9,6 +9,7 @@ import json
 from xlsxwriter.utility import xl_range
 import os
 
+os.environ['OPENSHIFT_DATA_DIR'] = './'   # TODO: remove before prod
 
 def clean_marks(string):
     try:

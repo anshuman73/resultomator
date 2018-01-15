@@ -150,7 +150,6 @@ def process(school_code, roll_no_range, net_choice):
     database_conn.close()
     print('{} valid records downloaded and saved'.format(count))
 
-
 if __name__ == '__main__':  # Allows to use it as standalone, for demonstration purposes
 
     schcode = input('Enter the School Code: ')
