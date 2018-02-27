@@ -8,6 +8,7 @@ import requests
 from requests.exceptions import ConnectionError
 from bs4 import BeautifulSoup
 import sqlite3
+import os
 
 
 def parser(html):
@@ -64,6 +65,8 @@ def process_range(string_inp):
 
 
 def process(school_code, roll_no_range, centre_no, net_choice):
+    if not os.path.exists('./webpages'):
+        os.mkdir('./webpages')
     database_conn = sqlite3.connect('raw_data.sqlite')
     cursor = database_conn.cursor()
     cursor.executescript('''
@@ -97,12 +100,12 @@ def process(school_code, roll_no_range, centre_no, net_choice):
         print('\nIncorrect Network mode chosen, defaulting to non-async\n')
         net_choice = False
     count = 0
-    headers = {'Referer': 'http://cbseresults.nic.in/class12npy/class12th17.htm',
+    headers = {'Referer': 'http://cbseresults.nic.in/class12npy/class12th17reval.htm',
                'Upgrade-Insecure-grequests': '1',
                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
                              ' Chrome/58.0.3029.110 Safari/537.36'}
     payloads = [{'regno': roll_no, 'sch': school_code, 'cno': centre_no, 'B2': 'Submit'} for roll_no in roll_no_range]
-    base_url = 'http://cbseresults.nic.in/class12npy/class12th17.asp'
+    base_url = 'http://cbseresults.nic.in/class12npy/class12th17reval.asp'
     print('Retrieving data for {} students, may take a few seconds depending on the network\n'.format(len(payloads)))
     if net_choice:
         responses = (grequests.post(base_url, headers=headers, data=load) for load in payloads)
@@ -135,6 +138,8 @@ def process(school_code, roll_no_range, centre_no, net_choice):
                                    'Practical_Marks, Total_Marks, Grade) VALUES (?, ?, ?, ?, ?, ?, ?)',
                                    (data['Roll No:'], subject['SUB CODE'], subject['SUB NAME'], subject['THEORY'],
                                     subject['PRACTICAL'], subject['MARKS'], subject['GRADE'], ))
+                with open('./webpages/{}-{}.html'.format(data['Roll No:'], data['Candidate Name:']), 'w') as html_page:
+                    html_page.write(page_source.text)
                 count += 1
             else:
                 print('Failed to retrieve data for Roll No. {}'.format(roll_no))
